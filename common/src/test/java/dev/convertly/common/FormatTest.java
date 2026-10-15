@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -21,14 +22,19 @@ public class FormatTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"image.png", "image.PNG", "image.PnG", "document.pdf", "photo.jpg"})
-  void fromFileName_shouldSupportDifferentExtensionCases(String fileName) {
+  @CsvSource({
+    "scan.PNG, PNG",
+    "image.png, PNG",
+    "image.PnG, PNG",
+    "document.pdf, PDF",
+    "photo.jpg, JPG",
+    "photo.jpeg, JPG"
+  })
+  void fromFileName_shouldSupportDifferentExtensionCases(String fileName, Format expectedFormat) {
+
     Format actualFormat = Format.fromFileName(fileName);
 
-    assertEquals(
-        Format.valueOf(
-            fileName.substring(fileName.lastIndexOf('.') + 1).toUpperCase(java.util.Locale.ROOT)),
-        actualFormat);
+    assertEquals(expectedFormat, actualFormat);
   }
 
   @Test
@@ -57,6 +63,5 @@ public class FormatTest {
         assertThrows(IllegalArgumentException.class, () -> Format.fromFileName("image.gif"));
 
     assertEquals("Unsupported file format: GIF", exception.getMessage());
-    assertInstanceOf(IllegalArgumentException.class, exception.getCause());
   }
 }

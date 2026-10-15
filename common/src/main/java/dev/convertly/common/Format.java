@@ -18,10 +18,12 @@ public enum Format {
     }
 
     String extension = name.substring(extensionIndex + 1).toUpperCase(Locale.ROOT);
-    try {
-      return Format.valueOf(extension);
-    } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException("Unsupported file format: " + extension, e);
-    }
+
+    return switch (extension) {
+      case "PNG" -> PNG;
+      case "JPEG", "JPG" -> JPG;
+      case "PDF" -> PDF;
+      default -> throw new IllegalArgumentException("Unsupported file format: " + extension);
+    };
   }
 }
