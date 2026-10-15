@@ -20,6 +20,15 @@ subprojects {
         }
     }
 
+    dependencies {
+        add("testImplementation", "org.junit.jupiter:junit-jupiter:5.13.1")
+        add("testRuntimeOnly", "org.junit.platform:junit-platform-launcher")
+    }
+
+    tasks.withType<Test>().configureEach {
+        useJUnitPlatform()
+    }
+
     apply(plugin = "com.diffplug.spotless")
 
     extensions.configure<SpotlessExtension> {
