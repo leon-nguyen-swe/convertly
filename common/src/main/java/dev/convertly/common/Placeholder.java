@@ -1,4 +1,3 @@
 package dev.convertly.common;
 
-public class Placeholder {
-}
+public class Placeholder {}
