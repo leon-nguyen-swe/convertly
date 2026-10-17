@@ -13,6 +13,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
+@Component
 public class ImageToPdfConverter implements Converter {
 
   @Override
