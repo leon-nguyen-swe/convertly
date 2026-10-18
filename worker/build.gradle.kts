@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("org.apache.pdfbox:pdfbox:3.0.8")
 	implementation(project(":common"))
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
