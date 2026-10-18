@@ -1,6 +1,5 @@
 package dev.convertly.worker.converter;
 
-import dev.convertly.common.Converter;
 import dev.convertly.common.Format;
 import java.io.IOException;
 import java.nio.file.Files;
