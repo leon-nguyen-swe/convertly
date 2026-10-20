@@ -58,7 +58,13 @@ public class ImageToPdfConverter implements Converter {
   }
 
   private void addImagePage(PDDocument document, Path input) throws IOException {
-    PDImageXObject image = PDImageXObject.createFromFile(input.toString(), document);
+    PDImageXObject image;
+
+    try {
+      image = PDImageXObject.createFromFile(input.toString(), document);
+    } catch (NullPointerException e) {
+      throw new IOException(e);
+    }
 
     PDPage page = new PDPage(new PDRectangle(image.getWidth(), image.getHeight()));
 
