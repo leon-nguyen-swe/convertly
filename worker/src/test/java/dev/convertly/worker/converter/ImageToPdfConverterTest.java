@@ -34,6 +34,8 @@ class ImageToPdfConverterTest {
 
     Path output = converter.convert(input, outputDir, Map.of());
 
+    assertEquals("sample.pdf", output.getFileName().toString());
+
     assertTrue(Files.isRegularFile(output));
 
     try (PDDocument pdf = Loader.loadPDF(output.toFile())) {
