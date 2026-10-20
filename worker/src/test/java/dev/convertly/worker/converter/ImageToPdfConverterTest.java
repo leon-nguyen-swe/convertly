@@ -56,25 +56,24 @@ class ImageToPdfConverterTest {
     assertThrows(IOException.class, () -> converter.convert(missing, tempDir, Map.of()));
   }
 
-
   @Test
   void convert_shouldCreateThreePagePdf_whenGivenThreeImages(@TempDir Path tempDir)
-          throws Exception {
+      throws Exception {
     List<String> fileNames = List.of("sample.png", "sample.jpg", "sample.jpeg");
 
     List<Path> inputs =
-            fileNames.stream()
-                    .map(fileName -> getClass().getResource("/samples/" + fileName))
-                    .peek(resource -> assertNotNull(resource, "Test resource not found"))
-                    .map(
-                            resource -> {
-                              try {
-                                return Path.of(resource.toURI());
-                              } catch (Exception e) {
-                                throw new RuntimeException(e);
-                              }
-                            })
-                    .toList();
+        fileNames.stream()
+            .map(fileName -> getClass().getResource("/samples/" + fileName))
+            .peek(resource -> assertNotNull(resource, "Test resource not found"))
+            .map(
+                resource -> {
+                  try {
+                    return Path.of(resource.toURI());
+                  } catch (Exception e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .toList();
 
     Path outputDir = tempDir.resolve("output");
 
@@ -90,30 +89,32 @@ class ImageToPdfConverterTest {
         PDRectangle box = pdf.getPage(i).getMediaBox();
 
         assertEquals(
-                image.getWidth(), box.getWidth(), 0.01,
-                "Page width does not match input image at index " + i);
+            image.getWidth(),
+            box.getWidth(),
+            0.01,
+            "Page width does not match input image at index " + i);
         assertEquals(
-                image.getHeight(), box.getHeight(), 0.01,
-                "Page height does not match input image at index " + i);
+            image.getHeight(),
+            box.getHeight(),
+            0.01,
+            "Page height does not match input image at index " + i);
       }
     }
   }
 
   @Test
-  void convert_shouldThrow_whenInputIsNotAnImage(@TempDir Path tempDir)
-          throws Exception {
+  void convert_shouldThrow_whenInputIsNotAnImage(@TempDir Path tempDir) throws Exception {
     Path fakeImage = tempDir.resolve("fake.png");
     Files.writeString(fakeImage, "This is not a real image");
 
     assertThrows(
-            IOException.class,
-            () -> converter.convert(fakeImage, tempDir.resolve("output"), Map.of()));
+        IOException.class, () -> converter.convert(fakeImage, tempDir.resolve("output"), Map.of()));
   }
 
   @Test
   void convert_shouldThrow_whenInputsAreEmpty(@TempDir Path tempDir) {
     assertThrows(
-            IllegalArgumentException.class,
-            () -> converter.convert(List.of(), tempDir.resolve("output"), Map.of()));
+        IllegalArgumentException.class,
+        () -> converter.convert(List.of(), tempDir.resolve("output"), Map.of()));
   }
 }

@@ -32,7 +32,8 @@ public class ImageToPdfConverter implements Converter {
     return convert(List.of(input), outDir, options);
   }
 
-  public Path convert(List<Path> inputs, Path outDir, Map<String, String> options) throws IOException {
+  public Path convert(List<Path> inputs, Path outDir, Map<String, String> options)
+      throws IOException {
     if (inputs == null || inputs.isEmpty()) {
       throw new IllegalArgumentException("inputs must not be empty");
     }
@@ -48,7 +49,7 @@ public class ImageToPdfConverter implements Converter {
     Path output = outDir.resolve(baseName(inputs.getFirst()) + ".pdf");
 
     try (PDDocument document = new PDDocument()) {
-      for  (Path input : inputs) {
+      for (Path input : inputs) {
         addImagePage(document, input);
       }
       document.save(output.toFile());
