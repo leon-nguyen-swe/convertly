@@ -4,6 +4,7 @@ import dev.convertly.common.Format;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -28,32 +29,60 @@ public class ImageToPdfConverter implements Converter {
 
   @Override
   public Path convert(Path input, Path outDir, Map<String, String> options) throws IOException {
-    if (!Files.isRegularFile(input)) {
-      throw new IOException("Invalid input file: " + input);
+    return convert(List.of(input), outDir, options);
+  }
+
+  @Override
+  public Path convert(List<Path> inputs, Path outDir, Map<String, String> options)
+      throws IOException {
+    if (inputs == null || inputs.isEmpty()) {
+      throw new IllegalArgumentException("inputs must not be empty");
+    }
+
+    for (Path input : inputs) {
+      if (input == null || !Files.isRegularFile(input)) {
+        throw new IOException("Invalid input file: " + input);
+      }
     }
 
     Files.createDirectories(outDir);
 
-    String fileName = input.getFileName().toString();
-    int extensionIndex = fileName.lastIndexOf('.');
-    String baseName = extensionIndex > 0 ? fileName.substring(0, extensionIndex) : fileName;
-
-    Path output = outDir.resolve(baseName + ".pdf");
+    Path output = outDir.resolve(baseName(inputs.getFirst()) + ".pdf");
+    if (Files.exists(output)) {
+      throw new IOException("Output already exists: " + output);
+    }
 
     try (PDDocument document = new PDDocument()) {
-      PDImageXObject image = PDImageXObject.createFromFile(input.toString(), document);
-
-      PDPage page = new PDPage(new PDRectangle(image.getWidth(), image.getHeight()));
-
-      document.addPage(page);
-
-      try (PDPageContentStream stream = new PDPageContentStream(document, page)) {
-        stream.drawImage(image, 0, 0, image.getWidth(), image.getHeight());
+      for (Path input : inputs) {
+        addImagePage(document, input);
       }
-
       document.save(output.toFile());
     }
 
     return output;
+  }
+
+  private void addImagePage(PDDocument document, Path input) throws IOException {
+    PDImageXObject image;
+
+    try {
+      image = PDImageXObject.createFromFileByContent(input.toFile(), document);
+    } catch (IllegalArgumentException e) {
+      throw new IOException("Not a supported image: " + input, e);
+    }
+
+    PDPage page = new PDPage(new PDRectangle(image.getWidth(), image.getHeight()));
+
+    document.addPage(page);
+
+    try (PDPageContentStream stream = new PDPageContentStream(document, page)) {
+      stream.drawImage(image, 0, 0, image.getWidth(), image.getHeight());
+    }
+  }
+
+  private static String baseName(Path input) {
+    String fileName = input.getFileName().toString();
+    int extensionIndex = fileName.lastIndexOf('.');
+    return extensionIndex > 0 ? fileName.substring(0, extensionIndex) : fileName;
   }
 }

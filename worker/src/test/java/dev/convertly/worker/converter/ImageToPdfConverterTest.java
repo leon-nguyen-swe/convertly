@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
 import org.apache.pdfbox.Loader;
@@ -34,6 +35,8 @@ class ImageToPdfConverterTest {
 
     Path output = converter.convert(input, outputDir, Map.of());
 
+    assertEquals("sample.pdf", output.getFileName().toString());
+
     assertTrue(Files.isRegularFile(output));
 
     try (PDDocument pdf = Loader.loadPDF(output.toFile())) {
@@ -51,5 +54,67 @@ class ImageToPdfConverterTest {
     Path missing = tempDir.resolve("missing");
 
     assertThrows(IOException.class, () -> converter.convert(missing, tempDir, Map.of()));
+  }
+
+  @Test
+  void convert_shouldCreateThreePagePdf_whenGivenThreeImages(@TempDir Path tempDir)
+      throws Exception {
+    List<String> fileNames = List.of("sample.png", "sample.jpg", "sample.jpeg");
+
+    List<Path> inputs =
+        fileNames.stream()
+            .map(fileName -> getClass().getResource("/samples/" + fileName))
+            .peek(resource -> assertNotNull(resource, "Test resource not found"))
+            .map(
+                resource -> {
+                  try {
+                    return Path.of(resource.toURI());
+                  } catch (Exception e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .toList();
+
+    Path outputDir = tempDir.resolve("output");
+
+    Path output = converter.convert(inputs, outputDir, Map.of());
+
+    assertTrue(Files.isRegularFile(output));
+
+    try (PDDocument pdf = Loader.loadPDF(output.toFile())) {
+      assertEquals(3, pdf.getNumberOfPages());
+
+      for (int i = 0; i < inputs.size(); i++) {
+        BufferedImage image = ImageIO.read(inputs.get(i).toFile());
+        PDRectangle box = pdf.getPage(i).getMediaBox();
+
+        assertEquals(
+            image.getWidth(),
+            box.getWidth(),
+            0.01,
+            "Page width does not match input image at index " + i);
+        assertEquals(
+            image.getHeight(),
+            box.getHeight(),
+            0.01,
+            "Page height does not match input image at index " + i);
+      }
+    }
+  }
+
+  @Test
+  void convert_shouldThrow_whenInputIsNotAnImage(@TempDir Path tempDir) throws Exception {
+    Path fakeImage = tempDir.resolve("fake.png");
+    Files.writeString(fakeImage, "This is not a real image");
+
+    assertThrows(
+        IOException.class, () -> converter.convert(fakeImage, tempDir.resolve("output"), Map.of()));
+  }
+
+  @Test
+  void convert_shouldThrow_whenInputsAreEmpty(@TempDir Path tempDir) {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> converter.convert(List.of(), tempDir.resolve("output"), Map.of()));
   }
 }
