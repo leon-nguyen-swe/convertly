@@ -32,6 +32,7 @@ public class ImageToPdfConverter implements Converter {
     return convert(List.of(input), outDir, options);
   }
 
+  @Override
   public Path convert(List<Path> inputs, Path outDir, Map<String, String> options)
       throws IOException {
     if (inputs == null || inputs.isEmpty()) {
@@ -39,7 +40,7 @@ public class ImageToPdfConverter implements Converter {
     }
 
     for (Path input : inputs) {
-      if (!Files.isRegularFile(input)) {
+      if (input == null || !Files.isRegularFile(input)) {
         throw new IOException("Invalid input file: " + input);
       }
     }
@@ -47,6 +48,9 @@ public class ImageToPdfConverter implements Converter {
     Files.createDirectories(outDir);
 
     Path output = outDir.resolve(baseName(inputs.getFirst()) + ".pdf");
+    if (Files.exists(output)) {
+      throw new IOException("Output already exists: " + output);
+    }
 
     try (PDDocument document = new PDDocument()) {
       for (Path input : inputs) {
@@ -62,9 +66,9 @@ public class ImageToPdfConverter implements Converter {
     PDImageXObject image;
 
     try {
-      image = PDImageXObject.createFromFile(input.toString(), document);
-    } catch (NullPointerException e) {
-      throw new IOException(e);
+      image = PDImageXObject.createFromFileByContent(input.toFile(), document);
+    } catch (IllegalArgumentException e) {
+      throw new IOException("Not a supported image: " + input, e);
     }
 
     PDPage page = new PDPage(new PDRectangle(image.getWidth(), image.getHeight()));
