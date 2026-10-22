@@ -16,10 +16,23 @@ public class ConverterRegistry {
 
   public ConverterRegistry(List<Converter> allConverters) {
     this.converters =
-        allConverters.stream()
-            .flatMap(
-                c -> c.sources().stream().map(s -> Map.entry(new ConversionKey(s, c.target()), c)))
-            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map.copyOf(
+            allConverters.stream()
+                .flatMap(
+                    c ->
+                        c.sources().stream()
+                            .map(s -> Map.entry(new ConversionKey(s, c.target()), c)))
+                .collect(
+                    toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> {
+                          throw new IllegalStateException(
+                              "Two converters for the same pair: "
+                                  + a.getClass().getSimpleName()
+                                  + " and "
+                                  + b.getClass().getSimpleName());
+                        })));
   }
 
   public Converter get(Format from, Format to) {

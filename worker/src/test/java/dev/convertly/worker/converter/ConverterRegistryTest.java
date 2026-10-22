@@ -49,6 +49,16 @@ class ConverterRegistryTest {
     assertSame(imageToPdf, registry.get(Format.JPG, Format.PDF));
   }
 
+  @Test
+  void get_shouldFindImageToPdfConverter_forPngAndJpg() {
+    Converter imageToPdf = new ImageToPdfConverter();
+
+    ConverterRegistry registry = new ConverterRegistry(List.of(imageToPdf));
+
+    assertSame(imageToPdf, registry.get(Format.PNG, Format.PDF));
+    assertSame(imageToPdf, registry.get(Format.JPG, Format.PDF));
+  }
+
   private record FakeConverter(Set<Format> sources, Format target) implements Converter {
 
     @Override
