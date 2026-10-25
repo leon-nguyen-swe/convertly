@@ -4,7 +4,7 @@ spring:
 
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/convertly}
-    username: ${DB_USERNAME:convertly-user}
+    username: ${DB_USER:convertly-user}
     password: ${DB_PASSWORD}
 
   jpa:

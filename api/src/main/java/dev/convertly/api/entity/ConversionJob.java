@@ -10,7 +10,9 @@ import java.util.UUID;
 @Entity
 public class ConversionJob {
 
-  @Id private final UUID id = UUID.randomUUID();
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, name = "status")
