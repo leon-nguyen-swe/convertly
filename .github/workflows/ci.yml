@@ -12,6 +12,26 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: convertly
+          POSTGRES_USER: convertly-user
+          POSTGRES_PASSWORD: convertly-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U convertly-user -d convertly"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB_URL: jdbc:postgresql://localhost:5432/convertly
+      DB_USER: convertly-user
+      DB_PASSWORD: convertly-password
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

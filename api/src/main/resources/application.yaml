@@ -1,3 +1,15 @@
 spring:
   application:
     name: api
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/convertly}
+    username: ${DB_USER:convertly-user}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
