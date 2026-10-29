@@ -26,6 +26,20 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      rabbitmq:
+        image: rabbitmq:4.3-management
+        env:
+          RABBITMQ_DEFAULT_USER: rabbitmq-default-user
+          RABBITMQ_DEFAULT_PASS: rabbitmq-default-pass
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+          --health-start-period 15s
 
     env:
       DB_URL: jdbc:postgresql://localhost:5432/convertly
