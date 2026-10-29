@@ -2,23 +2,74 @@ services:
   postgres:
     image: postgres:18
     container_name: convertly-postgres
-
     environment:
       POSTGRES_DB: convertly
       POSTGRES_USER: ${POSTGRES_USER:-convertly-user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
-
     ports:
       - "127.0.0.1:5432:5432"
-
     volumes:
       - postgres_data:/var/lib/postgresql
-
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
       interval: 5s
       timeout: 3s
       retries: 10
 
+  rabbitmq:
+    image: rabbitmq:4.3-management
+    container_name: convertly-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:?Set RABBITMQ_DEFAULT_USER in .env}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:?Set RABBITMQ_DEFAULT_PASS in .env}
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  storage:
+    image: rustfs/rustfs:1.0.3
+    environment:
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:?Set RUSTFS_ACCESS_KEY in .env}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:?Set RUSTFS_SECRET_KEY in .env}
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_CORS_ALLOWED_ORIGINS: http://localhost:5173
+    command:
+      - /data
+    volumes:
+      - rustfs_data:/data
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  create-bucket:
+    image: amazon/aws-cli
+    depends_on:
+      storage:
+          condition: service_healthy
+    environment:
+      AWS_ACCESS_KEY_ID: ${RUSTFS_ACCESS_KEY:?Set RUSTFS_ACCESS_KEY in .env}
+      AWS_SECRET_ACCESS_KEY: ${RUSTFS_SECRET_KEY:?Set RUSTFS_SECRET_KEY in .env}
+      AWS_DEFAULT_REGION: us-east-1
+    entrypoint: [ "/bin/sh", "-c" ]
+    command: >
+      "aws --endpoint-url http://storage:9000 s3 ls s3://convertly
+      || aws --endpoint-url http://storage:9000 s3 mb s3://convertly"
+
 volumes:
   postgres_data:
+  rabbitmq_data:
+  rustfs_data:
