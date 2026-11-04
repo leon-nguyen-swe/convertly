@@ -121,6 +121,18 @@ class ConversionJobTest {
     assertNull(job.getInputKey());
   }
 
+  @Test
+  void shouldThrowWhenAssignInputKeyMoreThanOnce() {
+    ConversionJob job = newJob();
+    String originalKey = "input/image.png";
+
+    job.assignInputKey(originalKey);
+
+    assertThrows(IllegalStateException.class, () -> job.assignInputKey("input/another.png"));
+
+    assertEquals(originalKey, job.getInputKey());
+  }
+
   // ==================== markUploaded ====================
 
   @Test

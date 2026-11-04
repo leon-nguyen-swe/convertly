@@ -127,7 +127,8 @@ public class ConversionJob {
 
   public void assignInputKey(String key) {
     if (this.jobStatus != JobStatus.PENDING) {
-      throw new IllegalStateException("JobStatus must be PENDING");
+      throw new IllegalStateException(
+          "Cannot assign an input key to a conversion job with status " + this.jobStatus);
     }
     if (key == null || key.isBlank()) {
       throw new IllegalArgumentException("key must not be null or blank");
@@ -140,21 +141,24 @@ public class ConversionJob {
 
   public void markUploaded() {
     if (this.jobStatus != JobStatus.PENDING) {
-      throw new IllegalStateException("JobStatus must be PENDING");
+      throw new IllegalStateException("Cannot mark UPLOADED from " + this.jobStatus);
+    }
+    if (inputKey == null) {
+      throw new IllegalStateException("Input key must be assigned before upload");
     }
     this.jobStatus = JobStatus.UPLOADED;
   }
 
   public void markQueued() {
     if (this.jobStatus != JobStatus.UPLOADED) {
-      throw new IllegalStateException("JobStatus must be UPLOADED");
+      throw new IllegalStateException("Cannot mark QUEUED from " + this.jobStatus);
     }
     this.jobStatus = JobStatus.QUEUED;
   }
 
   public void markRunning() {
     if (this.jobStatus != JobStatus.QUEUED && this.jobStatus != JobStatus.RUNNING) {
-      throw new IllegalStateException("JobStatus must be QUEUED or RUNNING");
+      throw new IllegalStateException("Cannot mark RUNNING from " + this.jobStatus);
     }
     this.jobStatus = JobStatus.RUNNING;
     if (startedAt == null) {
@@ -164,7 +168,7 @@ public class ConversionJob {
 
   public void markDone(String outputKey) {
     if (this.jobStatus != JobStatus.RUNNING) {
-      throw new IllegalStateException("JobStatus must be RUNNING");
+      throw new IllegalStateException("Cannot mark DONE from " + this.jobStatus);
     }
     if (outputKey == null || outputKey.isBlank()) {
       throw new IllegalArgumentException("outputKey must not be null or blank");
@@ -176,8 +180,7 @@ public class ConversionJob {
 
   public void markFailed(String message) {
     if (this.jobStatus == JobStatus.DONE || this.jobStatus == JobStatus.FAILED) {
-      throw new IllegalStateException(
-          "Cannot mark Failed state with Job status: " + this.jobStatus);
+      throw new IllegalStateException("Cannot mark FAILED from " + this.jobStatus);
     }
     this.jobStatus = JobStatus.FAILED;
     this.errorMessage = message;
