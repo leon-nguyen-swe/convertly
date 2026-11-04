@@ -23,6 +23,7 @@ class ConversionJobRepositoryTest {
   @Test
   void saveAndFindById_shouldPersistAndRetrieveConversionJob() {
     ConversionJob job = new ConversionJob(Format.PNG, Format.PDF, "sample.png", 1024L);
+    job.assignInputKey("input/sample.png");
 
     ConversionJob savedJob = conversionJobRepository.save(job);
     UUID jobId = savedJob.getId();
@@ -39,5 +40,8 @@ class ConversionJobRepositoryTest {
     assertThat(retrievedJob.getOriginalFileName()).isEqualTo("sample.png");
     assertThat(retrievedJob.getInputSizeBytes()).isEqualTo(1024L);
     assertThat(retrievedJob.getCreatedAt()).isNotNull();
+
+    assertThat(retrievedJob.getInputKey()).isEqualTo("input/sample.png");
+    assertThat(retrievedJob.getOutputKey()).isNull();
   }
 }
