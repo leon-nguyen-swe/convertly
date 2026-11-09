@@ -13,3 +13,10 @@ spring:
 
   flyway:
     enabled: true
+
+convertly:
+  storage:
+    endpoint: ${STORAGE_ENDPOINT:http://localhost:9000}
+    bucket: convertly
+    access-key: ${RUSTFS_ACCESS_KEY}
+    secret-key: ${RUSTFS_SECRET_KEY}
