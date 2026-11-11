@@ -14,6 +14,10 @@ spring:
   flyway:
     enabled: true
 
+  mvc:
+    problemdetails:
+      enabled: true
+
 convertly:
   storage:
     endpoint: ${STORAGE_ENDPOINT:http://localhost:9000}
