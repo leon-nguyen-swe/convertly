@@ -4,6 +4,7 @@ import dev.convertly.api.dto.request.CreateJobRequest;
 import dev.convertly.api.dto.response.CreateJobResponse;
 import dev.convertly.api.entity.ConversionJob;
 import dev.convertly.api.repository.ConversionJobRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +19,7 @@ public class JobService {
     this.storageService = storageService;
   }
 
+  @Transactional
   public CreateJobResponse create(CreateJobRequest request) {
     ConversionJob job =
         new ConversionJob(
@@ -25,7 +27,7 @@ public class JobService {
 
     repository.save(job);
 
-    job.assignInputKey("job/" + job.getId() + "/input");
+    job.assignInputKey("jobs/" + job.getId() + "/input");
 
     String uploadUrl = storageService.presignUpload(job.getInputKey());
 
