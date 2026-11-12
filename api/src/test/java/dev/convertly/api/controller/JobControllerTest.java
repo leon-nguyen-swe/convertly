@@ -21,8 +21,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(
-    controllers = JobController.class,
-    properties = "spring.mvc.problemdetails.enabled=true")
+    controllers = JobController.class)
 class JobControllerTest {
 
   private static final String API_URL = "/api/v1/jobs";

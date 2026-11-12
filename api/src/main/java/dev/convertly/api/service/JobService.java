@@ -4,8 +4,8 @@ import dev.convertly.api.dto.request.CreateJobRequest;
 import dev.convertly.api.dto.response.CreateJobResponse;
 import dev.convertly.api.entity.ConversionJob;
 import dev.convertly.api.repository.ConversionJobRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class JobService {
