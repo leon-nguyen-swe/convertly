@@ -9,8 +9,8 @@ public record CreateJobRequest(
     @NotNull Format targetFormat,
     @Positive @Max(10_485_760) long size) {
 
-    @AssertTrue(message = "Source and target format must be different")
-    public boolean isDifferentFormats() {
-        return sourceFormat != targetFormat;
-    }
+  @AssertTrue(message = "Source and target format must be different")
+  public boolean isDifferentFormats() {
+    return sourceFormat != targetFormat;
+  }
 }
