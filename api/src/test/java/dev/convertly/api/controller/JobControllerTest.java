@@ -1,7 +1,6 @@
 package dev.convertly.api.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -128,9 +127,10 @@ class JobControllerTest {
             "hello.png",
             null,
             createdAt,
-            startedAt);
+            startedAt,
+            null);
 
-    given(jobService.get(jobId)).willReturn(response);
+    when(jobService.get(jobId)).thenReturn(response);
 
     // Act & Assert
     mockMvc
@@ -155,7 +155,7 @@ class JobControllerTest {
     // Arrange
     UUID jobId = UUID.randomUUID();
 
-    given(jobService.get(jobId)).willThrow(new JobNotFoundException(jobId));
+    when(jobService.get(jobId)).thenThrow(new JobNotFoundException(jobId));
 
     // Act & Assert
     mockMvc
@@ -169,5 +169,21 @@ class JobControllerTest {
 
     verify(jobService).get(jobId);
     verifyNoMoreInteractions(jobService);
+  }
+
+  @Test
+  void get_shouldReturn409ProblemDetail_whenIllegalState() throws Exception {
+    // Arrange
+    UUID jobId = UUID.randomUUID();
+    when(jobService.get(jobId))
+        .thenThrow(new IllegalStateException("Cannot mark RUNNING from DONE"));
+
+    // Act & Assert
+    mockMvc
+        .perform(get("/api/v1/jobs/{id}", jobId))
+        .andExpect(status().isConflict())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+        .andExpect(jsonPath("$.status").value(409))
+        .andExpect(jsonPath("$.detail").value("Cannot mark RUNNING from DONE"));
   }
 }

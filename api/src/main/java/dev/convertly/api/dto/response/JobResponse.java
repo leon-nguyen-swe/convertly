@@ -14,7 +14,8 @@ public record JobResponse(
     String originalFilename,
     String errorMessage,
     Instant createdAt,
-    Instant startedAt) {
+    Instant startedAt,
+    Instant finishedAt) {
 
   public static JobResponse from(ConversionJob job) {
     return new JobResponse(
@@ -25,6 +26,7 @@ public record JobResponse(
         job.getOriginalFileName(),
         job.getErrorMessage(),
         job.getCreatedAt(),
-        job.getStartedAt());
+        job.getStartedAt(),
+        job.getFinishedAt());
   }
 }
