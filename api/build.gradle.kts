@@ -17,6 +17,8 @@ dependencies {
 	implementation(platform("software.amazon.awssdk:bom:2.46.7"))
 	implementation("software.amazon.awssdk:s3")
 
+	implementation("org.springframework.boot:spring-boot-starter-amqp")
+
 	implementation(project(":common"))
 
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")

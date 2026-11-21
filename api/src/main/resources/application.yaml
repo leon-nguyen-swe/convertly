@@ -18,6 +18,12 @@ spring:
     problemdetails:
       enabled: true
 
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_DEFAULT_USER}
+    password: ${RABBITMQ_DEFAULT_PASS}
+
 convertly:
   storage:
     endpoint: ${STORAGE_ENDPOINT:http://localhost:9000}
