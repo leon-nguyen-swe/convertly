@@ -21,8 +21,8 @@ spring:
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_DEFAULT_USER}
-    password: ${RABBITMQ_DEFAULT_PASS}
+    username: ${RABBITMQ_DEFAULT_USER:rabbitmq-default-user}
+    password: ${RABBITMQ_DEFAULT_PASS:rabbitmq-default-pass}
 
 convertly:
   storage:
