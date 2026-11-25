@@ -39,4 +39,10 @@ public class JobController {
 
     return ResponseEntity.ok(response);
   }
+
+  @PostMapping("/{id}/start")
+  public ResponseEntity<Void> startJob(@PathVariable UUID id) {
+    jobService.start(id);
+    return ResponseEntity.accepted().build();
+  }
 }

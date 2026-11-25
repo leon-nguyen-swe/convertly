@@ -17,4 +17,14 @@ public class ApiExceptionHandler {
   public ProblemDetail handleIllegalStateException(IllegalStateException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
   }
+
+  @ExceptionHandler(FileNotUploadedException.class)
+  public ProblemDetail handleFileNotUploadedException(FileNotUploadedException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+  }
+
+  @ExceptionHandler(FileTooLargeException.class)
+  public ProblemDetail handleFileTooLargeException(FileTooLargeException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+  }
 }
